@@ -193,7 +193,7 @@ select{cursor:pointer;appearance:none;-webkit-appearance:none}
   <div class="thanks" id="thanksGood">
     <div style="font-size:40px;color:var(--gold);margin-bottom:16px">✦</div>
     <h2>Dziękujemy za świetną ocenę!</h2>
-    <p>Cieszymy się, że kurs spełnił Twoje oczekiwania.<br>Jeśli masz chwilę, podziel się opinią publicznie — architektom prowadzącym będzie z pewnością bardzo miło :).</p>
+    <p>Cieszymy się, że kurs spełnił Twoje oczekiwania.<br>Jeśli masz chwilę, podziel się opinią publicznie — to bezcenne wsparcie dla naszej szkoły.</p>
     <a class="google-btn" id="googleLink" href="#" target="_blank" rel="noopener noreferrer">★ &nbsp;Wystaw opinię w Google</a>
     <p style="margin-top:28px;font-size:11px;color:var(--muted);letter-spacing:.15em;text-transform:uppercase">ON-ARCH Akademia</p>
   </div>
@@ -203,7 +203,7 @@ select{cursor:pointer;appearance:none;-webkit-appearance:none}
     <div style="font-size:40px;color:var(--gold);margin-bottom:16px">✦</div>
     <h2>Dziękujemy za szczerą opinię</h2>
     <p>Przykro nam, że nie wszystko było na poziomie, jakiego oczekiwałeś/aś.<br>Twoje uwagi trafiły bezpośrednio do nas i potraktujemy je bardzo poważnie.</p>
-    <p style="margin-top:10px">Jeśli chcesz, napisz do nas wprost: <span class="mail" id="mailLow">biuro@on-arch.pl</span></p>
+    <p style="margin-top:10px">Jeśli chcesz, napisz do nas wprost: <span class="mail" id="mailLow">info@on-arch.pl</span></p>
     <p style="margin-top:28px;font-size:11px;color:var(--muted);letter-spacing:.15em;text-transform:uppercase">ON-ARCH Akademia</p>
   </div>
 </div>
@@ -256,8 +256,9 @@ async function sub(){
   btn.disabled=true;var bt=btn.textContent;btn.textContent='Wysyłanie…';
   var ctrl=new AbortController();var tio=setTimeout(function(){ctrl.abort()},10000);
   try{
-    var res=await fetch(CONFIG.ZAPIS_URL,{
+    await fetch(CONFIG.ZAPIS_URL,{
       method:'POST',
+      mode:'no-cors',
       headers:{'Content-Type':'text/plain;charset=utf-8'},
       body:JSON.stringify({
         kurs:V['qk']||'', miasto:V['qm']||'',
@@ -271,9 +272,8 @@ async function sub(){
       signal:ctrl.signal
     });
     clearTimeout(tio);
-    var out=await res.json();
-    if(!res.ok||!out||out.status!=='ok')throw new Error(out&&out.message?out.message:'zapis nieudany');
-    // Potwierdzony zapis → dopiero teraz podziękowanie
+    // Tryb no-cors: odpowiedź Apps Script jest dla JS nieczytelna, więc nie da się odczytać {status:"ok"}.
+    // Jeśli fetch nie rzucił błędu sieci, żądanie zostało wysłane → pokazujemy podziękowanie.
     document.getElementById('prog').style.width='100%';
     pokazPodziekowanie();
   }catch(err){
